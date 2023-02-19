@@ -18,7 +18,6 @@ export default function Buscador(props) {
         await fetch(`https://omdbapi.com/?apikey=1a55c3a8&s=${cadenaBusqueda}`)
       ).json();
 
-      console.log("data:", data);
       // todo: acá falta atrapar el error, como cuando devuelve que hay muchos resultados, ej. buscando "us"
       if (data.Search) {
         setResultadoBusqueda(data.Search.filter((e) => e.Type === "series"));
@@ -31,7 +30,6 @@ export default function Buscador(props) {
 
   function isSaved(serieID) {
     let a = props.datosSeries.filter((e) => e.imdbID === serieID);
-    console.log(a);
     return a.length;
   }
 

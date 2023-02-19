@@ -129,7 +129,6 @@ function App() {
   function OrdenarListaSeries() {
     function ordenarTitulo() {
       let datosSeries = [...datosMisSeries];
-      console.log(datosSeries);
 
       if (ordenLista !== "TituloZA") {
         SetOrdenLista("TituloZA");
@@ -196,7 +195,6 @@ function App() {
       });
 
       setDatosMisSeries(datosSeries);
-      console.log(datosSeries);
     }
     return (
       <div className="flex flex-row justify-end font-bold text-xs pr-4">
