@@ -1,0 +1,38 @@
+{
+  "mis-series": [
+    {
+      "id": 1,
+      "imdbID": "tt0306414"
+    },
+    {
+      "id": 2,
+      "imdbID": "tt1279972"
+    },
+    {
+      "imdbID": "tt0121955",
+      "id": 3
+    },
+    {
+      "imdbID": "tt1279972",
+      "id": 4
+    },
+    {
+      "imdbID": "tt15135104",
+      "id": 5
+    },
+    {
+      "imdbID": "tt0106179",
+      "id": 6
+    }
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "body": "some comment",
+      "postId": 1
+    }
+  ],
+  "profile": {
+    "name": "typicode"
+  }
+}
