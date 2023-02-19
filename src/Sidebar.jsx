@@ -1,3 +1,5 @@
+import { TvIcon } from "@heroicons/react/24/solid";
+
 export default function Sidebar(props) {
   let selected = "px-4 py-3 rounded font-bold bg-blue-900 text-white";
   let unselected = "px-4 py-3 rounded text-black";
@@ -15,9 +17,9 @@ export default function Sidebar(props) {
 
   return (
     <>
-      <p className="text-2xl font-bold text-blue-900 border-b mb-4 p-4">
-        MyTVShows
-      </p>
+      <div className="flex flex-row text-2xl font-bold text-blue-900 border-b mb-4 p-4">
+        MyTVShows <TvIcon className="ml-2 h-8"/>
+      </div>
       <ul>
         <li className={menuItemStyle[0]}>
           <button onClick={() => props.menu(0)}>Series guardadas</button>

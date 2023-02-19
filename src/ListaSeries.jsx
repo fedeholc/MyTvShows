@@ -1,5 +1,7 @@
 import { TrashIcon } from "@heroicons/react/24/solid";
 
+
+
 function CardSeries(props) {
   let infoTemporadas = "";
   if (parseInt(props.datoss.TotalSeasons) == 1) {
