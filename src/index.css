@@ -5,3 +5,15 @@
 html {
   scrollbar-gutter: stable;
 }
+
+.supa_auth {
+  display: grid;
+  place-content: center;
+  border: 1px solid rgb(194, 194, 194);
+  margin: 1rem;
+  border-radius: 12px;
+}
+
+.supa_auth button {
+  color: black;
+}

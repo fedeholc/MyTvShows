@@ -27,6 +27,8 @@ export default function Sidebar(props) {
         <li className={menuItemStyle[1]}>
           <button onClick={() => props.menu(1)}>Buscar series</button>
         </li>
+        <li>{props.user}</li>
+        <li><button onClick={props.SignOut}>Sign Out</button></li>
       </ul>
     </>
   );
