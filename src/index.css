@@ -17,3 +17,9 @@ html {
 .supa_auth button {
   color: black;
 }
+
+.auth_msg {
+  display: grid;
+  place-content: center;
+  margin: 4rem 1rem 1rem 1rem;
+}

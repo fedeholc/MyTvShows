@@ -87,7 +87,9 @@ function App() {
   async function handleAddNewSerie(serieID) {
     // obtiene una nueva Key y guarda registro en Firebase
     const newPostKey = push(child(ref(databaseFirebase), "series")).key;
-    set(ref(databaseFirebase, "series/" + newPostKey), { imdbID: serieID });
+    set(ref(databaseFirebase, "series/" + session.user.id + "/" + newPostKey), {
+      imdbID: serieID,
+    });
 
     // busca la info de temporadas y último capítulo luego guarda en State
     let dataTemp = await getSerieData(serieID);
@@ -102,7 +104,7 @@ function App() {
       // TODO: manejo de errores
       // * Carga los datos de IDs guardados en FireBase
       let data = [];
-      await get(child(ref(databaseFirebase), `series`))
+      await get(child(ref(databaseFirebase), `series` + `/${session.user.id}`))
         .then((snapshot) => {
           if (snapshot.exists()) {
             snapshot.forEach((e) => {
@@ -247,17 +249,14 @@ function App() {
     );
   }
 
-  // ? tendría que cargar los valores iniciales con lazy state initialization?
-  // ? NO, daba error al querer usar datosMisSeries sin estar cargado
-  // ? en cambio al ponerlo en useEffect lo carga antes de hacer el render de la parte
-  // ? que lo va a usar.
+ 
   useEffect(() => {
-    CargarDatosMisSeries();
-  }, []);
+    console.log(session);
+    if (session) CargarDatosMisSeries();
+  }, [session]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log(session);
       setSession(session);
     });
 
@@ -272,7 +271,6 @@ function App() {
 
   async function handleSignOut() {
     const { error } = await supabase.auth.signOut();
-    console.log("hola");
     if (error) console.log("Error al hacer SignOut");
   }
 
@@ -282,28 +280,39 @@ function App() {
         <Sidebar
           menu={handleMenu}
           menuItems={sidebarMenu}
-          user={session ? session.user.email : "no user"}
+          user={session ? session.user.email : ""}
           SignOut={handleSignOut}
         />
       </div>
       <div className="border-r border-slate-400 basis-[600px]   min-h-screen pb-4 flex-shrink-0  px-4  ">
         {!session && (
-          <div className="supa_auth">
-            <Auth
-              supabaseClient={supabase}
-              appearance={{ theme: ThemeSupa }}
-              providers={["google", "github", "twitter"]}
-            />
+          <div>
+            <div className="auth_msg">
+              Por favor ingrese su usuario y contraseña, o regístrese si aún no
+              lo hizo.
+            </div>
+            <div className="supa_auth">
+              <Auth
+                supabaseClient={supabase}
+                appearance={{ theme: ThemeSupa }}
+                providers={["google", "github"]}
+              />
+            </div>
           </div>
         )}
-        {sidebarMenu[0] ? <Misseries1 /> : ""}
-        {sidebarMenu[1] ? (
-          <Buscador
-            datosSeries={datosMisSeries}
-            handleAdd={handleAddNewSerie}
-          />
-        ) : (
-          ""
+
+        {session && (
+          <div>
+            {sidebarMenu[0] ? <Misseries1 /> : ""}
+            {sidebarMenu[1] ? (
+              <Buscador
+                datosSeries={datosMisSeries}
+                handleAdd={handleAddNewSerie}
+              />
+            ) : (
+              ""
+            )}
+          </div>
         )}
       </div>
     </div>
