@@ -288,7 +288,7 @@ function App() {
         {!session && (
           <div>
             <div className="auth_msg">
-              Por favor ingrese su usuario y contraseña, o regístrese si aún no
+              Por favor ingrese su email y contraseña, o regístrese si aún no
               lo hizo.
             </div>
             <div className="supa_auth">
