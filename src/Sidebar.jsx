@@ -18,7 +18,7 @@ export default function Sidebar(props) {
   return (
     <>
       <div className="flex flex-row text-2xl font-bold text-blue-900 border-b mb-4 p-4">
-        MyTVShows <TvIcon className="ml-2 h-8"/>
+        MyTVShows <TvIcon className="ml-2 h-8" />
       </div>
       <ul>
         <li className={menuItemStyle[0]}>
@@ -28,6 +28,19 @@ export default function Sidebar(props) {
           <button onClick={() => props.menu(1)}>Buscar series</button>
         </li>
       </ul>
+
+      {props.user != "" && (
+        <div className="absolute bottom-10">
+          <div className="pt-1 pb-1">{props.user}</div>
+
+          <button
+            className="border-blue-900 rounded-md pt-1 pb-1 pl-3 pr-3 border-2 hover:text-white hover:bg-blue-900"
+            onClick={props.SignOut}
+          >
+            Log Out
+          </button>
+        </div>
+      )}
     </>
   );
 }

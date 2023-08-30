@@ -1,3 +1,4 @@
+//cspell:disable
 import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Buscador from "./Buscador";
@@ -5,6 +6,10 @@ import LoadingSpinner from "./LoadingSpinner.jsx";
 import { ref, set, push, child, get, remove } from "firebase/database";
 import { databaseFirebase } from "./MyFirebase";
 import ListaSeries from "./ListaSeries";
+import { createClient } from "@supabase/supabase-js";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
+import "./index.css";
 
 export async function getSerieData(serieID) {
   let dataCompleta = {};
@@ -52,12 +57,19 @@ export async function getSerieData(serieID) {
   return dataCompleta;
 }
 
+const supabase = createClient(
+  "https://xbnjcziobgswkczsvssv.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhibmpjemlvYmdzd2tjenN2c3N2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTMyNDc1MzAsImV4cCI6MjAwODgyMzUzMH0.FEYcuWPO4B4kDmOMbmXqy_K6TsW8xoRAF9CQCo0SRUU"
+);
+
 function App() {
   const [sidebarMenu, SetSidebarMenu] = useState([true, false]);
   const [ordenLista, SetOrdenLista] = useState("");
   const [datosMisSeries, setDatosMisSeries] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [session, setSession] = useState(null);
 
   function handleMenu(item) {
     //al clickear en un item del menu lo pone como true que sea visible en la pagina principal y al resto false para que no
@@ -75,7 +87,9 @@ function App() {
   async function handleAddNewSerie(serieID) {
     // obtiene una nueva Key y guarda registro en Firebase
     const newPostKey = push(child(ref(databaseFirebase), "series")).key;
-    set(ref(databaseFirebase, "series/" + newPostKey), { imdbID: serieID });
+    set(ref(databaseFirebase, "series/" + session.user.id + "/" + newPostKey), {
+      imdbID: serieID,
+    });
 
     // busca la info de temporadas y último capítulo luego guarda en State
     let dataTemp = await getSerieData(serieID);
@@ -90,7 +104,7 @@ function App() {
       // TODO: manejo de errores
       // * Carga los datos de IDs guardados en FireBase
       let data = [];
-      await get(child(ref(databaseFirebase), `series`))
+      await get(child(ref(databaseFirebase), `series` + `/${session.user.id}`))
         .then((snapshot) => {
           if (snapshot.exists()) {
             snapshot.forEach((e) => {
@@ -235,28 +249,70 @@ function App() {
     );
   }
 
-  // ? tendría que cargar los valores iniciales con lazy state initialization?
-  // ? NO, daba error al querer usar datosMisSeries sin estar cargado
-  // ? en cambio al ponerlo en useEffect lo carga antes de hacer el render de la parte
-  // ? que lo va a usar.
+ 
   useEffect(() => {
-    CargarDatosMisSeries();
+    console.log(session);
+    if (session) CargarDatosMisSeries();
+  }, [session]);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  async function handleSignOut() {
+    const { error } = await supabase.auth.signOut();
+    if (error) console.log("Error al hacer SignOut");
+  }
 
   return (
     <div className="bg-white flex flex-row justify-center  ">
       <div className="basis-[250px] bg-neutral-100 flex-shrink-0 px-4 border-x border-slate-400 sticky top-0 h-screen">
-        <Sidebar menu={handleMenu} menuItems={sidebarMenu} />
+        <Sidebar
+          menu={handleMenu}
+          menuItems={sidebarMenu}
+          user={session ? session.user.email : ""}
+          SignOut={handleSignOut}
+        />
       </div>
       <div className="border-r border-slate-400 basis-[600px]   min-h-screen pb-4 flex-shrink-0  px-4  ">
-        {sidebarMenu[0] ? <Misseries1 /> : ""}
-        {sidebarMenu[1] ? (
-          <Buscador
-            datosSeries={datosMisSeries}
-            handleAdd={handleAddNewSerie}
-          />
-        ) : (
-          ""
+        {!session && (
+          <div>
+            <div className="auth_msg">
+              Por favor ingrese su email y contraseña, o regístrese si aún no
+              lo hizo.
+            </div>
+            <div className="supa_auth">
+              <Auth
+                supabaseClient={supabase}
+                appearance={{ theme: ThemeSupa }}
+                providers={["google", "github"]}
+              />
+            </div>
+          </div>
+        )}
+
+        {session && (
+          <div>
+            {sidebarMenu[0] ? <Misseries1 /> : ""}
+            {sidebarMenu[1] ? (
+              <Buscador
+                datosSeries={datosMisSeries}
+                handleAdd={handleAddNewSerie}
+              />
+            ) : (
+              ""
+            )}
+          </div>
         )}
       </div>
     </div>

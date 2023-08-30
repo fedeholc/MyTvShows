@@ -1,3 +1,4 @@
+//cspell:disable
 import React, { useState, useEffect } from "react";
 import LoadingSpinner from "./LoadingSpinner.jsx";
 
